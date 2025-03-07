@@ -66,6 +66,7 @@
                         <th>Mata Kuliah</th>
                         <th>SKS</th>
                         <th>Jadwal</th>
+                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -74,10 +75,14 @@
                         <td th:text="${irs['MATKUL_NAMA']}"></td>
                         <td th:text="${irs['SKS']}"></td>
                         <td th:text="${irs['HARI']}"></td>
+                        <td>
+                            <span th:if="${irs['STATUS'] == 'Lulus'}" class="badge bg-success">Lulus</span>
+                            <span th:if="${irs['STATUS'] == 'Tidak Lulus'}" class="badge bg-danger">Tidak Lulus</span>
+                        </td>
                     </tr>
                 </tbody>
             </table>
-        </div>
+        </div>        
 
         <p class="text-center text-muted mt-3" th:if="${irsList == null or #lists.isEmpty(irsList)}">
             <i class="bi bi-exclamation-triangle"></i> Mahasiswa ini belum memiliki IRS.

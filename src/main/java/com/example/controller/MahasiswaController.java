@@ -65,35 +65,31 @@ public class MahasiswaController {
     }
 
     @GetMapping("/detail/{nim}")
-public String detail(@PathVariable("nim") String nim, Model model) {
-    try {
-        // Ambil data mahasiswa
-        String sqlMahasiswa = "SELECT * FROM mahasiswa WHERE nim = ?";
-        Mahasiswa mahasiswa = jdbcTemplate.queryForObject(
-            sqlMahasiswa, 
-            BeanPropertyRowMapper.newInstance(Mahasiswa.class), 
-            nim
-        );
-        model.addAttribute("mahasiswa", mahasiswa);
-
-        String sqlIRS = "SELECT i.ID_IRS AS \"ID_IRS\", i.SEMESTER AS \"SEMESTER\", " +
-            "i.MATKUL_ID AS \"MATKUL_ID\", mk.MATKUL_NAMA AS \"MATKUL_NAMA\", " +
-            "mk.SKS AS \"SKS\", mk.HARI AS \"HARI\" " +
-            "FROM IRS i " +
-            "JOIN MATA_KULIAH mk ON i.MATKUL_ID = mk.MATKUL_ID " +
-            "WHERE i.NIM = ?";
-
-        List<Map<String, Object>> irsList = jdbcTemplate.queryForList(sqlIRS, nim);
-
-        // Tambahkan debugging untuk melihat data yang diambil dari database
-        System.out.println("Query IRS Result: " + irsList);
-
-        model.addAttribute("irsList", irsList);
-
-    } catch (Exception e) {
-        model.addAttribute("error", "Data mahasiswa tidak ditemukan atau belum memiliki IRS.");
-        return "error";
-    }
-    return "detail";
-}
+    public String detail(@PathVariable("nim") String nim, Model model) {
+        try {
+            // Ambil data mahasiswa
+            String sqlMahasiswa = "SELECT * FROM mahasiswa WHERE nim = ?";
+            Mahasiswa mahasiswa = jdbcTemplate.queryForObject(
+                sqlMahasiswa, 
+                BeanPropertyRowMapper.newInstance(Mahasiswa.class), 
+                nim
+            );
+            model.addAttribute("mahasiswa", mahasiswa);
+    
+            // Ambil data IRS beserta status kelulusan
+            String sqlIRS = "SELECT i.ID_IRS, i.SEMESTER, i.MATKUL_ID, i.STATUS, " +
+                            "mk.MATKUL_NAMA, mk.SKS, mk.HARI " +
+                            "FROM IRS i " +
+                            "JOIN MATA_KULIAH mk ON i.MATKUL_ID = mk.MATKUL_ID " +
+                            "WHERE i.NIM = ?";
+            
+            List<Map<String, Object>> irsList = jdbcTemplate.queryForList(sqlIRS, nim);
+            model.addAttribute("irsList", irsList);
+    
+        } catch (Exception e) {
+            model.addAttribute("error", "Data mahasiswa tidak ditemukan atau belum memiliki IRS.");
+            return "error";
+        }
+        return "detail";
+    }    
 }
